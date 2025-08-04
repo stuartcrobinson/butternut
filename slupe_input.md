@@ -1,33 +1,94 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 10:42:36.544 pm
+📋 Output copied to clipboard @ 10:43:08.248 pm
 ---------------------
-b3c ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
-a2b ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+c4d ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+d5e ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
-I need to add some color to the robot.
-
 ```sh nesl
-#!nesl [@three-char-SHA-256: b3c]
+#!nesl [@three-char-SHA-256: c4d]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_b3c'
-def main():
-    frame = 0
-    try:
-        while True:
-            clear_screen()
-            print(Fore.CYAN + "Slupe Demo" + Style.RESET_ALL)
-            print()
-            
-            robot = draw_robot()
-            render_art(robot)
-            
-            frame += 1
-            time.sleep(0.3)
-    except KeyboardInterrupt:
-        print("\nRobot signing off!")
-EOT_b3c
-new_text = <<'EOT_b3c'
+old_text = <<'EOT_c4d'
+def draw_robot():
+   robot = """
+          ◇◆◇
+         ◆◇◆◇◆
+          ◇◆◇
+        
+ [o_o]
+ <| |>
+  / \\
+   """
+   return robot
+EOT_c4d
+new_text = <<'EOT_c4d'
+def draw_robot(frame=0):
+    frames = [
+        """
+           ◇◆◇
+          ◆◇◆◇◆
+           ◇◆◇
+
+     [o_o]
+     <| |>
+      / \\
+    """,
+        """
+           ◆◇◆
+          ◇◆◇◆◇
+           ◆◇◆
+         
+        [o_o]
+        \\| |/
+         / \\
+    """,
+        """
+           ◇◆◇
+          ◆◇◆◇◆
+           ◇◆◇
+         
+           [o_o]
+           /| |\\
+            / \\
+    """,
+        """
+           ◆◇◆
+          ◇◆◇◆◇
+           ◆◇◆
+         
+              [^_^]
+              \\| |/
+               \\ /
+    """,
+        """
+           ◇◆◇
+          ◆◇◆◇◆
+           ◇◆◇
+         
+           [o_o]
+           <| |>
+            / \\
+    """,
+        """
+           ◆◇◆
+          ◇◆◇◆◇
+           ◆◇◆
+         
+        [o_o]
+        /| |\\
+         / \\
+    """
+    ]
+    return frames[frame % len(frames)]
+EOT_c4d
+#!end_c4d
+```
+
+```sh nesl
+#!nesl [@three-char-SHA-256: d5e]
+action = "file_replace_text"
+path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
+old_text = <<'EOT_d5e'
 def main():
     clear_screen()
     print(Fore.CYAN + "Slupe Demo" + Style.RESET_ALL)
@@ -41,36 +102,23 @@ def main():
             time.sleep(1)
     except KeyboardInterrupt:
         print("\nRobot signing off!")
-EOT_b3c
-#!end_b3c
-```
-Now I will create the disco ball.
-
-```sh nesl
-#!nesl [@three-char-SHA-256: a2b]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_a2b'
-def draw_robot():
-    robot = """
-  [o_o]
-  <| |>
-   / \\
-    """
-    return robot
-EOT_a2b
-new_text = <<'EOT_a2b'
-def draw_robot():
-   robot = """
-          ◇◆◇
-         ◆◇◆◇◆
-          ◇◆◇
-        
- [o_o]
- <| |>
-  / \\
-   """
-   return robot
-EOT_a2b
-#!end_a2b
+EOT_d5e
+new_text = <<'EOT_d5e'
+def main():
+    frame = 0
+    try:
+        while True:
+            clear_screen()
+            print(Fore.CYAN + "Slupe Demo" + Style.RESET_ALL)
+            print()
+            
+            robot = draw_robot(frame)
+            render_art(robot, [Fore.WHITE, Fore.WHITE, Fore.WHITE, Fore.WHITE, Fore.YELLOW, Fore.BLUE, Fore.RED])
+            
+            frame += 1
+            time.sleep(0.3)
+    except KeyboardInterrupt:
+        print("\nRobot signing off!")
+EOT_d5e
+#!end_d5e
 ```

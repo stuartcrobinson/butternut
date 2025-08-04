@@ -1,13 +1,17 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:45:07.701 pm
+📋 Output copied to clipboard @ 09:46:13.933 pm
 ---------------------
-x9k ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+m2v ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
+Looking at the code, I see the issue - the `draw_robot()` function needs to import or have access to the `Fore` colors. The import is at the module level but the f-string in the function needs to reference it properly.
+
+Let me fix this:
+
 ```sh nesl
-#!nesl [@three-char-SHA-256: x9k]
+#!nesl [@three-char-SHA-256: m2v]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_x9k'
+old_text = <<'EOT_m2v'
 def draw_robot():
     robot = """
   [o_o]
@@ -15,15 +19,24 @@ def draw_robot():
    / \\
     """
     return robot
-EOT_x9k
-new_text = <<'EOT_x9k'
+
+def main():
+    clear_screen()
+    print(Fore.CYAN + "Slupe Demo")
+    print(Fore.WHITE + draw_robot())
+EOT_m2v
+new_text = <<'EOT_m2v'
 def draw_robot():
-    robot = f"""
-  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]
-  {Fore.BLUE}<| |>
-   {Fore.RED}/ \\
-    """
-    return robot
-EOT_x9k
-#!end_x9k
+    robot_parts = []
+    robot_parts.append(f"  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]{Style.RESET_ALL}")
+    robot_parts.append(f"  {Fore.BLUE}<| |>{Style.RESET_ALL}")
+    robot_parts.append(f"   {Fore.RED}/ \\{Style.RESET_ALL}")
+    return "\n".join(robot_parts)
+
+def main():
+    clear_screen()
+    print(Fore.CYAN + "Slupe Demo")
+    print(draw_robot())
+EOT_m2v
+#!end_m2v
 ```

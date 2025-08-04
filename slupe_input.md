@@ -1,7 +1,12 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 03:37:04.323 pm
+📋 Output copied to clipboard @ 03:38:29.913 pm
 ---------------------
-No NESL blocks found
+def ✅ file_write /tmp/t_near_timeout_boundary/first.txt
 === END ===
-extra content
-#!end_tst
+#!nesl [@three-char-SHA-256: def]
+action = "file_write"
+path = "/tmp/t_near_timeout_boundary/first.txt"
+content = <<'EOT_def'
+slow
+EOT_def
+#!end_def

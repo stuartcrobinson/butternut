@@ -1,27 +1,68 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 10:09:47.963 pm
+📋 Output copied to clipboard @ 10:10:43.946 pm
 ---------------------
-v3m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
-r8k ❌ file_read /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+h6j ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
+I see the issue - the `draw_robot` function doesn't have the frame parameter. Let me fix that:
+
 ```sh nesl
-#!nesl [@three-char-SHA-256: v3m]
+#!nesl [@three-char-SHA-256: h6j]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_v3m'
+old_text = <<'EOT_h6j'
+def draw_robot():
+    robot = """
+           ◇◆◇
+          ◆◇◆◇◆
+           ◇◆◇
+         
+  [o_o]
+  <| |>
+   / \\
+    """
+    return robot
+EOT_h6j
+new_text = <<'EOT_h6j'
 def draw_robot(frame=0):
-EOT_v3m
-new_text = <<'EOT_v3m'
-def draw_robot(frame=0):
-EOT_v3m
-#!end_v3m
-```
-
-Let me read the file to see what's happening:
-
-```sh nesl
-#!nesl [@three-char-SHA-256: r8k]
-action = "file_read"
-path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-#!end_r8k
+    frames = [
+        """
+        ◇◆◇
+       ◆◇◆◇◆
+        ◇◆◇
+         |
+  [o_o]
+  <| |>
+   / \\
+    """,
+        """
+        ◆◇◆
+       ◇◆◇◆◇
+        ◆◇◆
+         |
+  [o_o]
+  \\| |/
+   / \\
+    """,
+        """
+        ◇◆◇
+       ◆◇◆◇◆
+        ◇◆◇
+         |
+  [o_o]
+  /| |\\
+   / \\
+    """,
+        """
+        ◆◇◆
+       ◇◆◇◆◇
+        ◆◇◆
+         |
+  [^_^]
+  \\| |/
+   \\ /
+    """
+    ]
+    return frames[frame % len(frames)]
+EOT_h6j
+#!end_h6j
 ```

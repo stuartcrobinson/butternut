@@ -1,12 +1,12 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 03:38:47.995 pm
+📋 Output copied to clipboard @ 03:38:48.921 pm
 ---------------------
-34g ✅ file_write /tmp/t_valid_target_content_separated_by_empty_clipboard_1/1st.txt
+abc ✅ file_write /tmp/t_valid_target_content_separated_by_empty_clipboard_2/4th.txt
 === END ===
-#!nesl [@three-char-SHA-256: 34g]
+#!nesl [@three-char-SHA-256: abc]
 action = "file_write"
-path = "/tmp/t_valid_target_content_separated_by_empty_clipboard_1/1st.txt"
-content = <<'EOT_34g'
+path = "/tmp/t_valid_target_content_separated_by_empty_clipboard_2/4th.txt"
+content = <<'EOT_abc'
 hello
-EOT_34g
-#!end_34g
+EOT_abc
+#!end_abc

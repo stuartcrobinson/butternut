@@ -1,15 +1,14 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:39:57.059 pm
+📋 Output copied to clipboard @ 09:43:34.118 pm
 ---------------------
-x9m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+x2m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+p9k ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
-I'll add some color to the robot! Let me make a small change to give it some personality.
-
 ```sh nesl
-#!nesl [@three-char-SHA-256: x9m]
+#!nesl [@three-char-SHA-256: x2m]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_x9m'
+old_text = <<'EOT_x2m'
 def draw_robot():
     robot = """
   [o_o]-
@@ -17,21 +16,28 @@ def draw_robot():
    / \\
     """
     return robot
-EOT_x9m
-new_text = <<'EOT_x9m'
+EOT_x2m
+new_text = <<'EOT_x2m'
 def draw_robot():
-    robot = f"""{Fore.YELLOW}  [o_o]-
-{Fore.BLUE}  <| |>
-{Fore.GREEN}   / \\
+    robot = f"""
+  {Fore.YELLOW}[o_o]-{Style.RESET_ALL}
+  {Fore.GREEN}<| |>{Style.RESET_ALL}
+   {Fore.BLUE}/ \\{Style.RESET_ALL}
     """
     return robot
-EOT_x9m
-#!end_x9m
+EOT_x2m
+#!end_x2m
 ```
 
-This gives the robot:
-- Yellow head/face
-- Blue body
-- Green legs
-
-Run the script to see your colorful robot!
+```sh nesl
+#!nesl [@three-char-SHA-256: p9k]
+action = "file_replace_text"
+path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
+old_text = <<'EOT_p9k'
+    print(Fore.WHITE + draw_robot())
+EOT_p9k
+new_text = <<'EOT_p9k'
+    print(draw_robot())
+EOT_p9k
+#!end_p9k
+```

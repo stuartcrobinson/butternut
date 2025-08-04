@@ -1,26 +1,30 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 01:47:46.677 pm
+📋 Output copied to clipboard @ 01:50:58.130 pm
 ---------------------
-fs1 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts - Read access denied for
-fs2 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts - Read access denied for
+fs3 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts - Read access denied for
+fs4 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts - Read access denied for
 === END ===
-I see the issue now. Looking at the `formatters.ts` file, I can see that the listener component needs to be updated to handle the new partial failure case for `files_read`. The formatter is showing it as a simple success (✅) when it should show a warning (⚠️) with additional details.
-
-Let me update the `formatSummary` function in the formatters to handle the partial failure case:
+You're right! I need to fix the first replacement. Since it appears twice (once in `formatSummary` and once in `formatFullOutput`), I need to be more specific:
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: fs1]
+#!nesl [@three-char-SHA-256: fs3]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts"
-old_text = <<'EOT_fs1'
+old_text = <<'EOT_fs3'
+  // Add execution results
+  if (orchResult.results) {
+    for (const result of orchResult.results) {
       const icon = result.success ? '✅' : '❌';
       const primaryParam = getPrimaryParamFromResult(result);
 
       if (result.success) {
         lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam}`.trim());
       } else {
-EOT_fs1
-new_text = <<'EOT_fs1'
+EOT_fs3
+new_text = <<'EOT_fs3'
+  // Add execution results
+  if (orchResult.results) {
+    for (const result of orchResult.results) {
       let icon = result.success ? '✅' : '❌';
       const primaryParam = getPrimaryParamFromResult(result);
 
@@ -34,130 +38,91 @@ new_text = <<'EOT_fs1'
       } else if (result.success) {
         lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam}`.trim());
       } else {
-EOT_fs1
-#!end_fs1
+EOT_fs3
+#!end_fs3
 ```
 
-Now I need to update the `formatFileReadOutput` function to handle the errors in the output section:
+Now I need to do the same update in the `formatFullOutput` function:
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: fs2]
+#!nesl [@three-char-SHA-256: fs4]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe/proj/comp/listener/src/formatters.ts"
-old_text = <<'EOT_fs2'
-  } else if (result.action === 'files_read') {
-    // Multiple files read - data contains { paths: string[], content: string[] }
-    // Each element in content array corresponds to the file at the same index in paths
-    if (result.data.paths && result.data.content) {
-      lines.push(`Reading ${result.data.paths.length} files:`);
+old_text = <<'EOT_fs4'
+export function formatFullOutput(orchResult: OrchestratorResult): string {
+  const lines = ['=== SLUPE RESULTS ==='];
 
-      // List all files first
-      for (const path of result.data.paths) {
-        lines.push(`- ${path}`);
+  // Handle hook errors first
+  if (orchResult.hookErrors?.before) {
+    for (const error of orchResult.hookErrors.before) {
+      lines.push(`def ❌ - Hook failed: ${error.command}`);
+      lines.push(`          Error: ${error.error}`);
+      if (error.stderr?.trim()) {
+        lines.push(`          stderr: ${error.stderr.trim()}`);
       }
-
-      // Add blank line before file contents
-      lines.push('');
-
-      // Format each file's content with START/END markers
-      for (let i = 0; i < result.data.paths.length; i++) {
-        const path = result.data.paths[i];
-        const content = result.data.content[i];
-
-        lines.push(`=== START FILE: ${path} ===`);
-        lines.push(content || '[empty file]');
-        lines.push(`=== END FILE: ${path} ===`);
-
-        // Add blank line between files (except after the last one)
-        if (i < result.data.paths.length - 1) {
-          lines.push('');
-        }
+      if (error.stdout?.trim()) {
+        lines.push(`          stdout: ${error.stdout.trim()}`);
       }
-    } else {
-      // Fallback for unexpected format
-      lines.push(`Reading 0 files:`);
     }
-EOT_fs2
-new_text = <<'EOT_fs2'
-  } else if (result.action === 'files_read') {
-    // Multiple files read - data contains { paths: string[], content: string[], errors?: [{path, error}] }
-    // Each element in content array corresponds to the file at the same index in paths
-    const successCount = result.data.paths?.length || 0;
-    const failCount = result.data.errors?.length || 0;
-    const totalCount = successCount + failCount;
+  }
 
-    // Handle partial failures
-    if (result.data.errors && result.data.errors.length > 0) {
-      lines.push(`Successfully read ${successCount} of ${totalCount} files (${failCount} failed):`);
-      lines.push('');
+  // Add execution results
+  if (orchResult.results) {
+    for (const result of orchResult.results) {
+      const icon = result.success ? '✅' : '❌';
+      const primaryParam = getPrimaryParamFromResult(result);
 
-      // List successful files
-      if (successCount > 0) {
-        lines.push('✅ Successfully read:');
-        for (const path of result.data.paths) {
-          lines.push(`- ${path}`);
-        }
-        lines.push('');
+      if (result.success) {
+        lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam}`.trim());
+      } else {
+        lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam} - ${getErrorSummary(result.error, result)}`.trim());
       }
-
-      // List failed files
-      lines.push('❌ Failed to read:');
-      for (const error of result.data.errors) {
-        lines.push(`- ${error.path}: ${error.error}`);
-      }
-      lines.push('');
-
-      // Show content of successful files
-      if (successCount > 0) {
-        for (let i = 0; i < result.data.paths.length; i++) {
-          const path = result.data.paths[i];
-          const content = result.data.content[i];
-
-          lines.push(`=== START FILE: ${path} ===`);
-          lines.push(content || '[empty file]');
-          lines.push(`=== END FILE: ${path} ===`);
-
-          // Add blank line between files (except after the last one)
-          if (i < result.data.paths.length - 1) {
-            lines.push('');
-          }
-        }
-      }
-    } else if (result.data.paths && result.data.content) {
-      // All files read successfully
-      lines.push(`Reading ${result.data.paths.length} files:`);
-
-      // List all files first
-      for (const path of result.data.paths) {
-        lines.push(`- ${path}`);
-      }
-
-      // Add blank line before file contents
-      lines.push('');
-
-      // Format each file's content with START/END markers
-      for (let i = 0; i < result.data.paths.length; i++) {
-        const path = result.data.paths[i];
-        const content = result.data.content[i];
-
-        lines.push(`=== START FILE: ${path} ===`);
-        lines.push(content || '[empty file]');
-        lines.push(`=== END FILE: ${path} ===`);
-
-        // Add blank line between files (except after the last one)
-        if (i < result.data.paths.length - 1) {
-          lines.push('');
-        }
-      }
-    } else {
-      // Fallback for unexpected format
-      lines.push(`Reading 0 files:`);
     }
-EOT_fs2
-#!end_fs2
+  }
+EOT_fs4
+new_text = <<'EOT_fs4'
+export function formatFullOutput(orchResult: OrchestratorResult): string {
+  const lines = ['=== SLUPE RESULTS ==='];
+
+  // Handle hook errors first
+  if (orchResult.hookErrors?.before) {
+    for (const error of orchResult.hookErrors.before) {
+      lines.push(`def ❌ - Hook failed: ${error.command}`);
+      lines.push(`          Error: ${error.error}`);
+      if (error.stderr?.trim()) {
+        lines.push(`          stderr: ${error.stderr.trim()}`);
+      }
+      if (error.stdout?.trim()) {
+        lines.push(`          stdout: ${error.stdout.trim()}`);
+      }
+    }
+  }
+
+  // Add execution results
+  if (orchResult.results) {
+    for (const result of orchResult.results) {
+      let icon = result.success ? '✅' : '❌';
+      const primaryParam = getPrimaryParamFromResult(result);
+
+      // Check for partial success in files_read
+      if (result.success && result.action === 'files_read' && result.data?.errors) {
+        icon = '⚠️ ';
+        const totalFiles = (result.data.paths?.length || 0) + (result.data.errors?.length || 0);
+        const successCount = result.data.paths?.length || 0;
+        const failCount = result.data.errors?.length || 0;
+        lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam} - Read ${successCount} of ${totalFiles} files (${failCount} failed)`.trim());
+      } else if (result.success) {
+        lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam}`.trim());
+      } else {
+        lines.push(`${result.blockId} ${icon} ${result.action} ${primaryParam} - ${getErrorSummary(result.error, result)}`.trim());
+      }
+    }
+  }
+EOT_fs4
+#!end_fs4
 ```
 
-Now let's run the test again to see if it passes:
+Now let's run the test again:
 
 ```bash
 cd /Users/stuart/repos/slupe && npx vitest run --hideSkippedTests -t "files-read-partial-failure"

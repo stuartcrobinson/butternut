@@ -1,62 +1,75 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:54:55.154 pm
+📋 Output copied to clipboard @ 09:57:51.707 pm
 ---------------------
-p7w ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/watcher.py - Read access denied for
-d3m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/watcher.py - Read access denied for
+b4n ❌ file_write /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Write access denied for
 === END ===
-The issue is that the subprocess pipe is stripping ANSI color codes. We need to tell the subprocess to force color output even when piped. Let me fix the watcher:
-
 ```sh nesl
-#!nesl [@three-char-SHA-256: p7w]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe-ascii-demo/src/watcher.py"
-old_text = <<'EOT_p7w'
-            # Run artist.py as a subprocess
-            env = os.environ.copy()
-            env['PYTHONUNBUFFERED'] = '1'
-            self.process = subprocess.Popen(
-                [sys.executable, '-u', str(self.artist_path)],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                universal_newlines=True,
-                bufsize=0,
-                env=env,
-                preexec_fn=os.setsid if os.name != 'nt' else None,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
-            )
-EOT_p7w
-new_text = <<'EOT_p7w'
-            # Run artist.py as a subprocess
-            env = os.environ.copy()
-            env['PYTHONUNBUFFERED'] = '1'
-            env['FORCE_COLOR'] = '1'
-            env['COLORAMA_FORCE_COLOR'] = '1'
-            self.process = subprocess.Popen(
-                [sys.executable, '-u', str(self.artist_path)],
-                env=env,
-                preexec_fn=os.setsid if os.name != 'nt' else None,
-                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0
-            )
-EOT_p7w
-#!end_p7w
-```
+#!nesl [@three-char-SHA-256: b4n]
+action = "file_write"
+path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
+content = <<'EOT_b4n'
+import time
+import os
+from colorama import init, Fore, Back, Style
 
-```sh nesl
-#!nesl [@three-char-SHA-256: d3m]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe-ascii-demo/src/watcher.py"
-old_text = <<'EOT_d3m'
-    def read_output(self):
-        """Read and display output from artist.py"""
-        if self.process and self.process.stdout:
-            for line in iter(self.process.stdout.readline, ''):
-                if line:
-                    print(line, end='')
-EOT_d3m
-new_text = <<'EOT_d3m'
-    def read_output(self):
-        """Read and display output from artist.py"""
-        pass
-EOT_d3m
-#!end_d3m
+init()
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def draw_robot():
+    robot = """
+  [o_o]
+  <| |>
+   / \\
+    """
+    return robot
+
+def colorize_line(line, color_map=None):
+    if not color_map:
+        return line
+    
+    colored_line = ""
+    for char in line:
+        color = color_map.get(char, "")
+        colored_line += color + char
+    return colored_line + Style.RESET_ALL
+
+def render_art(art_text, line_colors=None):
+    lines = art_text.strip().split('\n')
+    
+    if line_colors:
+        for i, line in enumerate(lines):
+            if i < len(line_colors):
+                print(line_colors[i] + line + Style.RESET_ALL)
+            else:
+                print(line)
+    else:
+        print(art_text.strip())
+
+def main():
+    clear_screen()
+    print(Fore.CYAN + "Slupe Demo" + Style.RESET_ALL)
+    print()
+    
+    robot = draw_robot()
+    
+    robot_colors = [
+        Fore.YELLOW,
+        Fore.BLUE,
+        Fore.RED
+    ]
+    
+    render_art(robot, robot_colors)
+    
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nRobot signing off!")
+
+if __name__ == "__main__":
+    main()
+EOT_b4n
+#!end_b4n
 ```

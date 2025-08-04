@@ -1,12 +1,12 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 02:40:44.200 pm
+📋 Output copied to clipboard @ 02:40:45.284 pm
 ---------------------
-f73js6 ✅ file_write /tmp/t_target_copied_first/out.txt
+xyz ✅ file_write /tmp/t_target_copied_second_fast/second.txt
 === END ===
-#!nesl [@three-char-SHA-256: f73js6]
+#!nesl [@three-char-SHA-256: xyz]
 action = "file_write"
-path = "/tmp/t_target_copied_first/out.txt"
-content = <<'EOT_f73js6'
-hello
-EOT_f73js6
-#!end_f73js6
+path = "/tmp/t_target_copied_second_fast/second.txt"
+content = <<'EOT_xyz'
+test content
+EOT_xyz
+#!end_xyz

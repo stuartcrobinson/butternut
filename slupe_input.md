@@ -1,5 +1,5 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 11:21:51.374 pm
+📋 Output copied to clipboard @ 11:31:20.902 pm
 ---------------------
 b3c ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 a2b ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
@@ -51,22 +51,20 @@ def draw_robot():
     robot = """
   [o_o]
   <| |>
-   / \\
-    """
+   / \\"""
     return robot
 EOT_a2b
 new_text = <<'EOT_a2b'
 def draw_robot():
-   robot = """
+    robot = """
         ◇◆◇
        ◆◇◆◇◆
         ◇◆◇
-     
- [o_o]
- <| |>
-  / \\
-   """
-   return robot
+    
+  [o_o]
+  <| |>
+   / \\"""
+    return robot
 EOT_a2b
 #!end_a2b
 ```

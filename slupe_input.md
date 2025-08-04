@@ -1,5 +1,5 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 10:37:55.601 pm
+📋 Output copied to clipboard @ 10:42:36.544 pm
 ---------------------
 b3c ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 a2b ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
@@ -52,12 +52,12 @@ action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
 old_text = <<'EOT_a2b'
 def draw_robot():
-   robot = """
- [o_o]
- <| |>
-  / \\
-   """
-   return robot
+    robot = """
+  [o_o]
+  <| |>
+   / \\
+    """
+    return robot
 EOT_a2b
 new_text = <<'EOT_a2b'
 def draw_robot():

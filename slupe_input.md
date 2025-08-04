@@ -1,19 +1,30 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:46:57.028 pm
+📋 Output copied to clipboard @ 09:47:34.802 pm
 ---------------------
-k7j ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+v8m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
-Ah, the first replacement actually worked! The robot now has color in the `draw_robot()` function. But there's still an issue - in `main()`, we're printing with `Fore.WHITE` which is overriding the colors. Let me fix that:
+The issue might be that `autoreset=True` in the colorama init is resetting colors too early. Let me try a different approach with explicit color codes in the string:
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: k7j]
+#!nesl [@three-char-SHA-256: v8m]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_k7j'
-    print(Fore.WHITE + draw_robot())
-EOT_k7j
-new_text = <<'EOT_k7j'
-    print(draw_robot())
-EOT_k7j
-#!end_k7j
+old_text = <<'EOT_v8m'
+def draw_robot():
+    robot = f"""
+  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]
+  {Fore.BLUE}<| |>
+   {Fore.RED}/ \\
+    """
+    return robot
+EOT_v8m
+new_text = <<'EOT_v8m'
+def draw_robot():
+    lines = []
+    lines.append(f"  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]")
+    lines.append(f"  {Fore.BLUE}<| |>")
+    lines.append(f"   {Fore.RED}/ \\")
+    return "\n".join(lines)
+EOT_v8m
+#!end_v8m
 ```

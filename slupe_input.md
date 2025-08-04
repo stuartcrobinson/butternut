@@ -1,38 +1,26 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:58:31.696 pm
+📋 Output copied to clipboard @ 10:00:31.514 pm
 ---------------------
-g5p ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+r2k ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
 === END ===
 ```sh nesl
-#!nesl [@three-char-SHA-256: g5p]
+#!nesl [@three-char-SHA-256: r2k]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_g5p'
-def render_art(art_text, line_colors=None):
-    lines = art_text.strip().split('\n')
+old_text = <<'EOT_r2k'
+    robot = draw_robot()
     
-    if line_colors:
-        for i, line in enumerate(lines):
-            if i < len(line_colors):
-                print(line_colors[i] + line + Style.RESET_ALL)
-            else:
-                print(line)
-    else:
-        print(art_text.strip())
-EOT_g5p
-new_text = <<'EOT_g5p'
-def render_art(art_text, line_colors=None):
-    lines = art_text.strip('\n').split('\n')
+    robot_colors = [
+        Fore.YELLOW,
+        Fore.BLUE,
+        Fore.RED
+    ]
     
-    if line_colors:
-        for i, line in enumerate(lines):
-            if i < len(line_colors):
-                print(line_colors[i] + line + Style.RESET_ALL)
-            else:
-                print(line)
-    else:
-        for line in lines:
-            print(line)
-EOT_g5p
-#!end_g5p
+    render_art(robot, robot_colors)
+EOT_r2k
+new_text = <<'EOT_r2k'
+    robot = draw_robot()
+    render_art(robot)
+EOT_r2k
+#!end_r2k
 ```

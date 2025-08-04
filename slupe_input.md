@@ -1,5 +1,5 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 01:43:51.027 pm
+📋 Output copied to clipboard @ 01:46:25.031 pm
 ---------------------
 rd1 ❌ file_read /Users/stuart/repos/slupe/proj/comp/listener/src/index.ts - Read access denied for
 === END ===

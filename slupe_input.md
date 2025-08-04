@@ -1,186 +1,165 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 01:35:54.544 pm
+📋 Output copied to clipboard @ 01:40:38.848 pm
 ---------------------
-fr1 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/fs-ops/src/actions/files_read.ts - Read access denied for
-fr2 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md - Read access denied for
-fr3 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md - Read access denied for
-fr4 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md - Read access denied for
+ft1 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md - Read access denied for
 === END ===
-I'll implement the changes to make `files_read` return partial results when some files fail. Let me start by updating the main handler:
+I'll add a test case for `files_read` with partial failures to the listener workflow integration tests. This will ensure the output formatting works correctly when some files are missing.
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: fr1]
+#!nesl [@three-char-SHA-256: ft1]
 action = "file_replace_text"
-path = "/Users/stuart/repos/slupe/proj/comp/fs-ops/src/actions/files_read.ts"
-old_text = <<'EOT_fr1'
-  // Check if any files failed to read
-  const failedFiles = results.filter(r => r.error);
-  if (failedFiles.length > 0) {
-    // Return error listing all failed files
-    const errorDetails = failedFiles
-      .map(f => `  ${f.path}: ${f.error}`)
-      .join('\n');
-    return {
-      success: false,
-      error: `files_read: Failed to read ${failedFiles.length} file(s):\n${errorDetails}`
-    };
-  }
+path = "/Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md"
+old_text = <<'EOT_ft1'
+### listener-parsing-errors
+EOT_ft1
+new_text = <<'EOT_ft1'
+### files-read-partial-failure
 
-  // All files read successfully - return contents as array
-  const contents = results.map(r => r.content!);
+#### Initial Content
+````sh
+Testing files read with some missing files.
+````
 
-  return {
-    success: true,
-    data: {
-      paths: pathList,
-      content: contents
-    }
-  };
-EOT_fr1
-new_text = <<'EOT_fr1'
-  // Separate successful and failed files
-  const successfulFiles = results.filter(r => !r.error);
-  const failedFiles = results.filter(r => r.error);
-
-  // If all files failed, return error
-  if (successfulFiles.length === 0 && failedFiles.length > 0) {
-    const errorDetails = failedFiles
-      .map(f => `  ${f.path}: ${f.error}`)
-      .join('\n');
-    return {
-      success: false,
-      error: `files_read: Failed to read all ${failedFiles.length} file(s):\n${errorDetails}`
-    };
-  }
-
-  // Build data object with successful reads
-  const data: any = {
-    paths: successfulFiles.map(r => r.path),
-    content: successfulFiles.map(r => r.content!)
-  };
-
-  // Add error information if there were any failures
-  if (failedFiles.length > 0) {
-    data.errors = failedFiles.map(f => ({
-      path: f.path,
-      error: f.error
-    }));
-  }
-
-  return {
-    success: true,
-    data
-  };
-EOT_fr1
-#!end_fr1
-```
-
-Now let me update the test case that expects the old behavior:
+#### New Content
+````sh
+Testing files read with some missing files.
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: fr2]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md"
-old_text = <<'EOT_fr2'
-```json
-{
-  "success": false,
-  "error": "files_read: Failed to read 2 file(s):\n  /tmp/t_read-with-missing-file/files-read-missing/does-not-exist.txt: ENOENT: no such file or directory, open '/tmp/t_read-with-missing-file/files-read-missing/does-not-exist.txt'\n  /tmp/t_read-with-missing-file/files-read-missing/also-missing.txt: ENOENT: no such file or directory, open '/tmp/t_read-with-missing-file/files-read-missing/also-missing.txt'"
-}
-```
-EOT_fr2
-new_text = <<'EOT_fr2'
-```json
-{
-  "success": true,
-  "data": {
-    "paths": ["/tmp/t_read-with-missing-file/files-read-missing/exists.txt"],
-    "content": ["This file exists"],
-    "errors": [
-      {
-        "path": "/tmp/t_read-with-missing-file/files-read-missing/does-not-exist.txt",
-        "error": "ENOENT: no such file or directory, open '/tmp/t_read-with-missing-file/files-read-missing/does-not-exist.txt'"
-      },
-      {
-        "path": "/tmp/t_read-with-missing-file/files-read-missing/also-missing.txt",
-        "error": "ENOENT: no such file or directory, open '/tmp/t_read-with-missing-file/files-read-missing/also-missing.txt'"
-      }
-    ]
-  }
-}
-```
-EOT_fr2
-#!end_fr2
-```
-
-Let me add a new test case for when all files fail to read:
-
-```sh nesl
-#!nesl [@three-char-SHA-256: fr3]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md"
-old_text = <<'EOT_fr3'
-### 006-read-files-with-special-content
-EOT_fr3
-new_text = <<'EOT_fr3'
-### 006-read-all-missing-files
-
-```
+#!nesl [@three-char-SHA-256: pf1]
+action = "file_write"
+path = "/tmp/t_listener_partial_read/exists1.txt"
+content = <<'EOT_pf1'
+This is the first file that exists.
+It has multiple lines.
+Line 3 here.
+EOT_pf1
+#!end_pf1
 ```
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: am1]
+#!nesl [@three-char-SHA-256: pf2]
+action = "file_write"
+path = "/tmp/t_listener_partial_read/exists2.txt"
+content = <<'EOT_pf2'
+Second file content.
+Also exists successfully.
+EOT_pf2
+#!end_pf2
+```
+
+```sh nesl
+#!nesl [@three-char-SHA-256: pf3]
 action = "files_read"
-paths = <<'EOT_am1'
-/tmp/t_read-all-missing/files-read-all-missing/missing1.txt
-/tmp/t_read-all-missing/files-read-all-missing/missing2.txt
-/tmp/t_read-all-missing/files-read-all-missing/missing3.txt
-EOT_am1
-#!end_am1
+paths = <<'EOT_pf3'
+/tmp/t_listener_partial_read/exists1.txt
+/tmp/t_listener_partial_read/missing1.txt
+/tmp/t_listener_partial_read/exists2.txt
+/tmp/t_listener_partial_read/missing2.txt
+/tmp/t_listener_partial_read/also_missing.txt
+EOT_pf3
+#!end_pf3
 ```
+````
 
-```json
-{
-  "success": false,
-  "error": "files_read: Failed to read all 3 file(s):\n  /tmp/t_read-all-missing/files-read-all-missing/missing1.txt: ENOENT: no such file or directory, open '/tmp/t_read-all-missing/files-read-all-missing/missing1.txt'\n  /tmp/t_read-all-missing/files-read-all-missing/missing2.txt: ENOENT: no such file or directory, open '/tmp/t_read-all-missing/files-read-all-missing/missing2.txt'\n  /tmp/t_read-all-missing/files-read-all-missing/missing3.txt: ENOENT: no such file or directory, open '/tmp/t_read-all-missing/files-read-all-missing/missing3.txt'"
-}
-```
-
-### 007-read-files-with-special-content
-EOT_fr3
-#!end_fr3
-```
-
-Now I need to update the test number in the last test case:
+#### Expected Prepended Results
+````sh
+=== SLUPE RESULTS ===
+pf1 ✅ file_write /tmp/t_listener_partial_read/exists1.txt
+pf2 ✅ file_write /tmp/t_listener_partial_read/exists2.txt
+pf3 ⚠️  files_read (5 files) - Read 2 of 5 files (3 failed)
+=== END ===
+Testing files read with some missing files.
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: fr4]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe/proj/comp/fs-ops/test-data/integration/write_action_result/files_read.cases.md"
-old_text = <<'EOT_fr4'
-### 007-read-files-with-special-content
-EOT_fr4
-new_text = <<'EOT_fr4'
-### 007-read-files-with-special-content
-EOT_fr4
-#!end_fr4
+#!nesl [@three-char-SHA-256: pf1]
+action = "file_write"
+path = "/tmp/t_listener_partial_read/exists1.txt"
+content = <<'EOT_pf1'
+This is the first file that exists.
+It has multiple lines.
+Line 3 here.
+EOT_pf1
+#!end_pf1
 ```
 
-The changes are complete! Here's what I've implemented:
+```sh nesl
+#!nesl [@three-char-SHA-256: pf2]
+action = "file_write"
+path = "/tmp/t_listener_partial_read/exists2.txt"
+content = <<'EOT_pf2'
+Second file content.
+Also exists successfully.
+EOT_pf2
+#!end_pf2
+```
 
-1. **Modified `files_read.ts`** to return partial results:
-   - Separates successful and failed file reads
-   - Returns success with data for successful reads, even if some files failed
-   - Includes an `errors` array in the data when there are failures
-   - Only returns complete failure when ALL files fail
+```sh nesl
+#!nesl [@three-char-SHA-256: pf3]
+action = "files_read"
+paths = <<'EOT_pf3'
+/tmp/t_listener_partial_read/exists1.txt
+/tmp/t_listener_partial_read/missing1.txt
+/tmp/t_listener_partial_read/exists2.txt
+/tmp/t_listener_partial_read/missing2.txt
+/tmp/t_listener_partial_read/also_missing.txt
+EOT_pf3
+#!end_pf3
+```
+````
 
-2. **Updated test case 003** to expect the new behavior:
-   - Now expects `success: true` with partial results
-   - Returns the content of the existing file
-   - Includes error details for the missing files
+#### Expected Output File
+````sh
+=== SLUPE RESULTS ===
+pf1 ✅ file_write /tmp/t_listener_partial_read/exists1.txt
+pf2 ✅ file_write /tmp/t_listener_partial_read/exists2.txt
+pf3 ⚠️  files_read (5 files) - Read 2 of 5 files (3 failed)
+=== END ===
 
-3. **Added test case 006** for when all files fail:
-   - Tests the scenario where no files can be read
-   - Ensures we still get a proper error response in this case
+=== OUTPUTS ===
 
-The new behavior makes `files_read` much more useful for bulk operations, as you'll get whatever files could be read successfully along with clear error information about any failures.
+[pf3] files_read:
+Successfully read 2 of 5 files (3 failed):
+
+✅ Successfully read:
+- /tmp/t_listener_partial_read/exists1.txt
+- /tmp/t_listener_partial_read/exists2.txt
+
+❌ Failed to read:
+- /tmp/t_listener_partial_read/missing1.txt: ENOENT: no such file or directory, open '/tmp/t_listener_partial_read/missing1.txt'
+- /tmp/t_listener_partial_read/missing2.txt: ENOENT: no such file or directory, open '/tmp/t_listener_partial_read/missing2.txt'
+- /tmp/t_listener_partial_read/also_missing.txt: ENOENT: no such file or directory, open '/tmp/t_listener_partial_read/also_missing.txt'
+
+=== START FILE: /tmp/t_listener_partial_read/exists1.txt ===
+This is the first file that exists.
+It has multiple lines.
+Line 3 here.
+=== END FILE: /tmp/t_listener_partial_read/exists1.txt ===
+
+=== START FILE: /tmp/t_listener_partial_read/exists2.txt ===
+Second file content.
+Also exists successfully.
+=== END FILE: /tmp/t_listener_partial_read/exists2.txt ===
+=== END ===
+````
+
+### listener-parsing-errors
+EOT_ft1
+#!end_ft1
+```
+
+This test case demonstrates:
+
+1. **Summary Line**: Shows `⚠️` (warning) instead of ✅ or ❌, with a clear summary: "Read 2 of 5 files (3 failed)"
+
+2. **Detailed Output**: 
+   - Clear summary at the top showing success/failure counts
+   - Separate sections for successful and failed files
+   - Full error messages for each failed file
+   - Complete content for successfully read files
+
+3. **User-Friendly Format**:
+   - Uses visual indicators (✅/❌) for clarity
+   - Groups successes and failures separately
+   - Shows the actual file content only for files that were successfully read
+
+The warning symbol (⚠️) indicates partial success, which is more accurate than showing complete success (✅) or complete failure (❌) for this scenario.

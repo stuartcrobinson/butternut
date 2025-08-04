@@ -1,144 +1,59 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 02:35:37.432 pm
+📋 Output copied to clipboard @ 02:37:19.055 pm
 ---------------------
-tc1 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md - Read access denied for
-tc2 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md - Read access denied for
-tc3 ❌ file_read /Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md - Read access denied for
+tc4 ❌ file_replace_text /Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md - Read access denied for
 === END ===
-Looking at the test failures, I can see that the test cases need to be updated to match the new grouped output format. The key differences are:
-
-1. For failed file replacements: The format should be `[fn2 ❌] /path/to/file:` instead of `[fn2] file_replace_text /path/to/file (failed - showing file contents):`
-2. For successful file reads: The format should be `[rf2 ✅] /path/to/file:` instead of `[rf2] file_read:`
-
-Let me update the test cases to match the new format:
+You're right! Looking at the excerpt, I can see the "failed-file-replace-text-multiple-matches" test case. It currently shows no outputs, but based on the new format, it should show the file contents when a replacement fails due to multiple matches. Let me fix it:
 
 ```sh nesl
-#!nesl [@three-char-SHA-256: tc1]
+#!nesl [@three-char-SHA-256: tc4]
 action = "file_replace_text"
 path = "/Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md"
-old_text = <<'EOT_tc1'
+old_text = <<'EOT_tc4'
 #### Expected Output File
 ````sh
 === SLUPE RESULTS ===
-fn1 ✅ file_write /tmp/t_listener_no_match/readme.md
-fn2 ❌ file_replace_text /tmp/t_listener_no_match/readme.md - old_text not found in file
+fm1 ✅ file_write /tmp/t_listener_multi_match/app.js
+fm2 ❌ file_replace_text /tmp/t_listener_multi_match/app.js - old_text appears 2 times, must appear exactly once
+=== END ===
+
+=== OUTPUTS ===
+=== END ===
+````
+EOT_tc4'
+new_text = <<'EOT_tc4'
+#### Expected Output File
+````sh
+=== SLUPE RESULTS ===
+fm1 ✅ file_write /tmp/t_listener_multi_match/app.js
+fm2 ❌ file_replace_text /tmp/t_listener_multi_match/app.js - old_text appears 2 times, must appear exactly once
 === END ===
 
 === OUTPUTS ===
 
-[fn2] file_replace_text /tmp/t_listener_no_match/readme.md (failed - showing file contents):
-=== START FILE: /tmp/t_listener_no_match/readme.md ===
-# Project README
+[fm2 ❌] /tmp/t_listener_multi_match/app.js:
+=== START FILE: /tmp/t_listener_multi_match/app.js ===
+// Application code
+function process() {
+  const value = 100;
+  console.log(value);
+  
+  if (value > 50) {
+    console.log("High value");
+  }
+  
+  return value;
+}
 
-This is a sample project.
-
-## Installation
-
-Run the following command:
-- npm install
-
-## Usage
-
-Start the application with:
-- npm start
-=== END FILE: /tmp/t_listener_no_match/readme.md ===
+function validate() {
+  const value = 100;
+  return value > 0;
+}
+=== END FILE: /tmp/t_listener_multi_match/app.js ===
 === END ===
 ````
-EOT_tc1'
-new_text = <<'EOT_tc1'
-#### Expected Output File
-````sh
-=== SLUPE RESULTS ===
-fn1 ✅ file_write /tmp/t_listener_no_match/readme.md
-fn2 ❌ file_replace_text /tmp/t_listener_no_match/readme.md - old_text not found in file
-=== END ===
-
-=== OUTPUTS ===
-
-[fn2 ❌] /tmp/t_listener_no_match/readme.md:
-=== START FILE: /tmp/t_listener_no_match/readme.md ===
-# Project README
-
-This is a sample project.
-
-## Installation
-
-Run the following command:
-- npm install
-
-## Usage
-
-Start the application with:
-- npm start
-=== END FILE: /tmp/t_listener_no_match/readme.md ===
-=== END ===
-````
-EOT_tc1'
-#!end_tc1
+EOT_tc4'
+#!end_tc4
 ```
 
-```sh nesl
-#!nesl [@three-char-SHA-256: tc2]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md"
-old_text = <<'EOT_tc2'
-#### Expected Output File
-````sh
-=== SLUPE RESULTS ===
-rf1 ✅ file_write /tmp/t_listener_read/sample.py
-rf2 ✅ file_read /tmp/t_listener_read/sample.py
-=== END ===
-
-=== OUTPUTS ===
-
-[rf2] file_read:
-=== START FILE: /tmp/t_listener_read/sample.py ===
-#!/usr/bin/env python3
-"""Sample Python file for testing."""
-
-def greet(name):
-    """Return a greeting message."""
-    return f"Hello, {name}!"
-
-if __name__ == "__main__":
-    print(greet("World"))
-=== END FILE: /tmp/t_listener_read/sample.py ===
-=== END ===
-````
-EOT_tc2'
-new_text = <<'EOT_tc2'
-#### Expected Output File
-````sh
-=== SLUPE RESULTS ===
-rf1 ✅ file_write /tmp/t_listener_read/sample.py
-rf2 ✅ file_read /tmp/t_listener_read/sample.py
-=== END ===
-
-=== OUTPUTS ===
-
-[rf2 ✅] /tmp/t_listener_read/sample.py:
-=== START FILE: /tmp/t_listener_read/sample.py ===
-#!/usr/bin/env python3
-"""Sample Python file for testing."""
-
-def greet(name):
-    """Return a greeting message."""
-    return f"Hello, {name}!"
-
-if __name__ == "__main__":
-    print(greet("World"))
-=== END FILE: /tmp/t_listener_read/sample.py ===
-=== END ===
-````
-EOT_tc2'
-#!end_tc2
-```
-
-Now I need to check if the "failed-file-replace-text-multiple-matches" test case needs updating. Looking at the test output, it seems this test might be passing already since it's not showing file contents (because the error is about multiple matches, not "not found"). But let me check if there's an expected output section for it that needs updating:
-
-```sh nesl
-#!nesl [@three-char-SHA-256: tc3]
-action = "file_read"
-path = "/Users/stuart/repos/slupe/proj/comp/listener/test-data/integration/listener-workflow-v2.cases.md"
-#!end_tc3
-```
+This update adds the expected file contents output for the failed replacement due to multiple matches, following the new grouped format `[fm2 ❌] /path/to/file:`.

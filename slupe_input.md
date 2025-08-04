@@ -1,30 +1,42 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 09:47:44.968 pm
+📋 Output copied to clipboard @ 09:50:00.160 pm
 ---------------------
-v8m ❌ file_replace_text /Users/stuart/repos/slupe-ascii-demo/src/artist.py - Read access denied for
+t4p ❌ file_write /Users/stuart/repos/slupe-ascii-demo/src/color_test.py - Write access denied for
 === END ===
-The issue might be that `autoreset=True` in the colorama init is resetting colors too early. Let me try a different approach with explicit color codes in the string:
-
 ```sh nesl
-#!nesl [@three-char-SHA-256: v8m]
-action = "file_replace_text"
-path = "/Users/stuart/repos/slupe-ascii-demo/src/artist.py"
-old_text = <<'EOT_v8m'
-def draw_robot():
-    robot = f"""
-  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]
-  {Fore.BLUE}<| |>
-   {Fore.RED}/ \\
-    """
-    return robot
-EOT_v8m
-new_text = <<'EOT_v8m'
-def draw_robot():
-    lines = []
-    lines.append(f"  {Fore.YELLOW}[{Fore.GREEN}o_o{Fore.YELLOW}]")
-    lines.append(f"  {Fore.BLUE}<| |>")
-    lines.append(f"   {Fore.RED}/ \\")
-    return "\n".join(lines)
-EOT_v8m
-#!end_v8m
+#!nesl [@three-char-SHA-256: t4p]
+action = "file_write"
+path = "/Users/stuart/repos/slupe-ascii-demo/src/color_test.py"
+content = <<'EOT_t4p'
+from colorama import init, Fore, Back, Style
+
+init()
+
+print(Fore.RED + "This should be red")
+print(Fore.GREEN + "This should be green")
+print(Fore.BLUE + "This should be blue")
+print(Fore.YELLOW + "This should be yellow")
+print(Fore.MAGENTA + "This should be magenta")
+print(Fore.CYAN + "This should be cyan")
+
+print(Style.RESET_ALL)
+
+print(Fore.RED + "R" + Fore.GREEN + "A" + Fore.BLUE + "I" + Fore.YELLOW + "N" + Fore.MAGENTA + "B" + Fore.CYAN + "O" + Fore.RED + "W")
+
+print(Style.RESET_ALL)
+
+print(Back.RED + "Red background" + Style.RESET_ALL)
+print(Back.GREEN + Fore.BLACK + "Green background with black text" + Style.RESET_ALL)
+
+print("\nSimple colored art:")
+print(Fore.YELLOW + "  ☀")
+print(Fore.BLUE + "~~~~")
+print(Fore.GREEN + " 🌱 ")
+EOT_t4p
+#!end_t4p
+```
+
+Run this with:
+```bash
+python /Users/stuart/repos/slupe-ascii-demo/src/color_test.py
 ```

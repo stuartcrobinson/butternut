@@ -1,10 +1,12 @@
 === SLUPE RESULTS ===
-📋 Output copied to clipboard @ 03:38:39.904 pm
+📋 Output copied to clipboard @ 03:38:44.659 pm
 ---------------------
-d748f3s ✅ file_write /tmp/t_simple_works/2.txt
+def ✅ file_write /tmp/t_near_timeout_boundary/first.txt
 === END ===
-#!nesl [@three-char-SHA-256: d748f3s]
+#!nesl [@three-char-SHA-256: def]
 action = "file_write"
-path = "/tmp/t_simple_works/2.txt"
-content = "hi"
-#!end_d748f3s
+path = "/tmp/t_near_timeout_boundary/first.txt"
+content = <<'EOT_def'
+slow
+EOT_def
+#!end_def
